@@ -58,3 +58,59 @@ th { background: #eef4f9; }
 .back { display: inline-block; margin: 12px 0; }
 .footer { margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--border); color: #728293; font-size: 13px; text-align: center; }
 @media (max-width: 600px) { body { padding: 8px; } .shell { border-radius: 12px; } .masthead { gap: 12px; } .logo { width: 62px; height: 62px; } .table-actions { flex-wrap: wrap; } }
+.choice {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  padding: 1rem;
+  border: 3px solid #d0d5dd;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, background .15s, opacity .15s;
+}
+
+.choice:hover {
+  border-color: #98a2b3;
+}
+
+/* Tarjeta seleccionada */
+.choice:has(input[type="radio"]:checked) {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, .25);
+}
+
+/* Insignia "SELECCIONADA" */
+.choice:has(input[type="radio"]:checked)::after {
+  content: "✓ SELECCIONADA";
+  position: absolute;
+  top: -14px;
+  right: 12px;
+  padding: .25rem .75rem;
+  border-radius: 999px;
+  background: #16a34a;
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+
+/* Atenúa la opción NO elegida cuando ya hay una marcada */
+.choices:has(input[type="radio"]:checked) .choice:not(:has(input:checked)) {
+  opacity: .55;
+}
+
+/* El radio sigue visible y más grande, accesible por teclado */
+.choice input[type="radio"] {
+  width: 1.4rem;
+  height: 1.4rem;
+  accent-color: #16a34a;
+}
+
+/* Foco por teclado */
+.choice:has(input[type="radio"]:focus-visible) {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
