@@ -65,7 +65,7 @@ if ($error !== ''): ?>
     <input id="email" name="email" type="email" maxlength="255" required value="<?= h($_POST['email'] ?? '') ?>">
     <label for="foto_anverso">Fotografía del anverso del DPI</label>
     <input id="foto_anverso" name="foto_anverso" type="file" accept="image/jpeg,image/png,image/webp" required>
-    <p class="hint">JPG, PNG o WEBP · Máximo 5 MB. El documento se almacena fuera de la carpeta pública.</p>
+    <p class="hint">JPG, PNG o WEBP · Máximo 5 MB</p>
     <button class="btn btn-primary" type="submit">Enviar registro</button>
 </form>
 <a class="back" href="/index.php">Volver al inicio</a>
