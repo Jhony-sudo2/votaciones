@@ -7,7 +7,7 @@ foreach (db()->query('SELECT opcion_voto, COUNT(*) AS cantidad FROM votos GROUP 
     $results[$row['opcion_voto']] = (int) $row['cantidad'];
 }
 $totalVotes = array_sum($results);
-page_start('Panel de resultados', 'Resumen administrativo de la demostración');
+page_start('Panel de resultados', 'Resumen administrativo');
 ?>
 <nav class="topnav"><a class="btn btn-secondary" href="/operador.php">Validación de registros</a></nav>
 <div class="stats">

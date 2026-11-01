@@ -58,6 +58,47 @@ th { background: #eef4f9; }
 .back { display: inline-block; margin: 12px 0; }
 .footer { margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--border); color: #728293; font-size: 13px; text-align: center; }
 @media (max-width: 600px) { body { padding: 8px; } .shell { border-radius: 12px; } .masthead { gap: 12px; } .logo { width: 62px; height: 62px; } .table-actions { flex-wrap: wrap; } }
+.choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.choice-image {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  height: 160px;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+/* Teléfonos: una columna y imagen más pequeña */
+@media (max-width: 640px) {
+  .choices {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .choice {
+    flex-direction: row;       /* imagen a la izquierda, texto a la derecha */
+    align-items: center;
+    gap: .75rem;
+    padding: .75rem;
+  }
+
+  .choice-image {
+    width: 90px;
+    height: 90px;
+    max-width: 90px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .choice-content {
+    font-size: .95rem;
+  }
+}
 .choice {
   position: relative;
   display: flex;
