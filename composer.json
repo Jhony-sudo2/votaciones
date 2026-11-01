@@ -1,0 +1,16 @@
+{
+  "name": "caserio-la-libertad/sistema-votacion-demo",
+  "description": "Demostración de sistema de votación para uso educativo; no es un sistema electoral certificado.",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.5",
+    "ext-pdo": "*",
+    "ext-fileinfo": "*",
+    "phpmailer/phpmailer": "^6.9"
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
+}

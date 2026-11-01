@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Votación Caserío La Libertad">
+  <rect width="120" height="120" rx="20" fill="#124672"/>
+  <path d="M32 56h56v35H32z" fill="#fff"/><path d="M25 52h70v12H25z" fill="#a5d4ee"/>
+  <path d="m43 37 23-15 20 30-23 15z" fill="#fff" stroke="#124672" stroke-width="3"/>
+  <path d="m53 43 9 7 15-20" fill="none" stroke="#13865c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="46" y="69" width="28" height="5" rx="2" fill="#124672"/>
+</svg>
