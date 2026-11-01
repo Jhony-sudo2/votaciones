@@ -40,16 +40,25 @@ function db(): PDO
     $name = env_value('DB_NAME', 'sistema_votacion');
     $user = env_value('DB_USER', 'votacion_user');
     $pass = env_value('DB_PASSWORD');
+
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ];
+
+    // En Azure: DB_SSL=true. En local con Docker: no se define.
+    if (in_array(strtolower(env_value('DB_SSL', 'false')), ['1', 'true', 'yes'], true)) {
+        $options[PDO::MYSQL_ATTR_SSL_CA] = env_value('DB_SSL_CA', '/etc/ssl/certs/ca-certificates.crt');
+        $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+    }
+
     try {
         $pdo = new PDO(
             "mysql:host={$host};port={$port};dbname={$name};charset=utf8mb4",
             $user,
             $pass,
-            [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
-            ]
+            $options
         );
     } catch (PDOException $exception) {
         error_log('Error de conexión a BD: ' . $exception->getMessage());
