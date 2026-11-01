@@ -33,4 +33,3 @@ if ($error !== ''): ?><div class="alert alert-error" role="alert"><?= h($error) 
     <button class="btn btn-primary" type="submit">Ingresar al panel</button>
 </form>
 <a class="back" href="/index.php">Volver al inicio</a>
-<?php page_end(); ?>

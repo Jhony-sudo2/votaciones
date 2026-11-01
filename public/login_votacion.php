@@ -34,4 +34,3 @@ if ($error !== ''): ?><div class="alert alert-error" role="alert"><?= h($error) 
 </form>
 <p class="note">Si todavía no tienes credenciales, primero completa tu registro y espera la validación del operador.</p>
 <a class="back" href="/registro.php">Registrarme</a>
-<?php page_end(); ?>

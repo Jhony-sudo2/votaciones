@@ -22,4 +22,3 @@ page_start('Cerrar sesión');
 <p>¿Deseas terminar tu sesión?</p>
 <form action="/logout.php" method="post" class="form"><input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>"><button type="submit" class="btn btn-primary">Sí, cerrar sesión</button></form>
 <a class="back" href="/index.php">Volver al inicio</a>
-<?php page_end(); ?>

@@ -69,4 +69,3 @@ if ($error !== ''): ?>
     <button class="btn btn-primary" type="submit">Enviar registro</button>
 </form>
 <a class="back" href="/index.php">Volver al inicio</a>
-<?php page_end(); ?>

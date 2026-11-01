@@ -24,4 +24,3 @@ page_start('Panel de resultados', 'Resumen administrativo de la demostración');
     <tr><td>Planilla La Paloma</td><td><?= $results['opcion2'] ?></td><td><?= $totalVotes ? number_format(100 * $results['opcion2'] / $totalVotes, 1) : '0.0' ?>%</td></tr>
     </tbody></table></div>
 <form action="/logout.php" method="post" class="logout-form"><input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>"><button type="submit" class="btn btn-outline">Cerrar sesión</button></form>
-<?php page_end(); ?>

@@ -11,5 +11,4 @@ page_start('Sistema de Votación');
     <a class="btn btn-secondary" href="/login_votacion.php">Acceder a votación</a>
     <a class="btn btn-outline" href="/login_operador.php">Acceso de operadores</a>
 </nav>
-<p class="note">Aplicación de práctica: no utilizar en elecciones reales sin auditorías, controles organizativos y revisión legal.</p>
-<?php page_end(); ?>
+

@@ -26,12 +26,3 @@ function page_start(string $title, string $subtitle = 'Elecciones Comunales 2026
 <?php
 }
 
-function page_end(): void
-{
-    ?>
-    <footer class="footer">Sistema de demostración · La seguridad electoral requiere auditoría independiente</footer>
-</main>
-</body>
-</html>
-<?php
-}

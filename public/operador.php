@@ -114,4 +114,3 @@ page_start('Panel de Operadores', 'Validación de personas registradas');
     </table></div>
 <?php endif; ?>
 <form action="/logout.php" method="post" class="logout-form"><input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>"><button type="submit" class="btn btn-outline">Cerrar sesión</button></form>
-<?php page_end(); ?>

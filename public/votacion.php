@@ -113,4 +113,3 @@ page_start('Sistema de Votación');
     <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
     <button type="submit" class="btn btn-outline">Cerrar sesión</button>
 </form>
-<?php page_end(); ?>
