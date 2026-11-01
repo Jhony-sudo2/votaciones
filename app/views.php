@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-function page_start(string $title, string $subtitle = 'Elecciones Comunales 2026 · Caserío La Libertad'): void
+function page_start(string $title, string $subtitle = 'Elecciones Comunales 2027 · Caserío La Libertad'): void
 {
     ?>
 <!doctype html>
