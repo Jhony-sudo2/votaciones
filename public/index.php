@@ -1,13 +1,17 @@
 <?php
 require_once dirname(__DIR__) . '/app/bootstrap.php';
+$registrationWindow = registration_window();
 page_start('Sistema de Votación');
 ?>
 <section class="hero">
     <h2>ELECCIONES COMUNALES DE CASERÍO LA LIBERTAD</h2>
     <p>Período 2027</p>
 </section>
+<?php show_registration_window($registrationWindow); ?>
 <nav class="actions" aria-label="Menú principal">
-    <a class="btn btn-primary" href="/registro.php">Registrarse para votar</a>
+    <?php if ($registrationWindow['is_open']): ?>
+        <a class="btn btn-primary" href="/registro.php">Registrarse para votar</a>
+    <?php endif; ?>
     <a class="btn btn-secondary" href="/login_votacion.php">Acceder a votación</a>
 </nav>
 

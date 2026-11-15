@@ -1,5 +1,16 @@
 <?php
 require_once dirname(__DIR__) . '/app/bootstrap.php';
+$registrationWindow = registration_window();
+if (!$registrationWindow['is_open']) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        http_response_code(403);
+    }
+    page_start('Registro de votante');
+    show_flash();
+    show_registration_window($registrationWindow);
+    echo '<a class="back" href="/index.php">Volver al inicio</a>';
+    exit;
+}
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -27,16 +38,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $fileName = bin2hex(random_bytes(24)) . '.' . $types[$mime];
             $base = dirname(__DIR__) . '/storage/uploads';
-            if (!is_dir($base) && !mkdir($base, 0700, true) && !is_dir($base)) {
+            $registrationWindow = registration_window();
+            if (!$registrationWindow['is_open']) {
+                http_response_code(403);
+            } elseif (!is_dir($base) && !mkdir($base, 0700, true) && !is_dir($base)) {
                 $error = 'No se pudo preparar el almacenamiento de imágenes.';
             } elseif (!move_uploaded_file($file['tmp_name'], $base . '/' . $fileName)) {
                 $error = 'No se pudo guardar la imagen.';
             } else {
                 try {
                     $query = db()->prepare('INSERT INTO usuarios (dpi, nombre_completo, email, foto_anverso) VALUES (?, ?, ?, ?)');
-                    $query->execute([$dpi, $nombre, $email, $fileName]);
-                    set_flash('success', 'Registro enviado. Un operador validará tu información.');
-                    redirect('registro.php');
+                    // La carga o la conexión a MySQL pueden haber demorado hasta el cierre.
+                    $registrationWindow = registration_window();
+                    if (!$registrationWindow['is_open']) {
+                        @unlink($base . '/' . $fileName);
+                        http_response_code(403);
+                    } else {
+                        $query->execute([$dpi, $nombre, $email, $fileName]);
+                        set_flash('success', 'Registro enviado. Un operador validará tu información.');
+                        redirect('registro.php');
+                    }
                 } catch (PDOException $exception) {
                     @unlink($base . '/' . $fileName);
                     if ($exception->getCode() === '23000') {
@@ -50,11 +71,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+$registrationWindow = registration_window();
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$registrationWindow['is_open']) {
+    http_response_code(403);
+}
 page_start('Registro de votante');
 show_flash();
+show_registration_window($registrationWindow);
 if ($error !== ''): ?>
     <div class="alert alert-error" role="alert"><?= h($error) ?></div>
 <?php endif; ?>
+<?php if ($registrationWindow['is_open']): ?>
 <form method="post" enctype="multipart/form-data" class="form" autocomplete="on">
     <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
     <label for="dpi">DPI (13 dígitos)</label>
@@ -68,4 +95,5 @@ if ($error !== ''): ?>
     <p class="hint">JPG, PNG o WEBP · Máximo 5 MB</p>
     <button class="btn btn-primary" type="submit">Enviar registro</button>
 </form>
+<?php endif; ?>
 <a class="back" href="/index.php">Volver al inicio</a>

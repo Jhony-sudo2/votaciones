@@ -19,6 +19,8 @@ DB_PASSWORD=$DBPASS
 DB_ROOT_PASSWORD=$ROOTPASS
 ADMIN_USER=admin
 ADMIN_PASSWORD=$ADMINPASS
+REGISTRO_APERTURA=
+REGISTRO_CIERRE=
 SMTP_HOST=
 SMTP_PORT=587
 SMTP_ENCRYPTION=tls
@@ -37,3 +39,5 @@ if ! command -v docker >/dev/null 2>&1; then
 fi
 docker compose up --build -d
 printf '\nAbre http://127.0.0.1:8080/\n'
+printf 'Configura REGISTRO_APERTURA y REGISTRO_CIERRE en .env (AAAA-MM-DD HH:MM:SS, hora de Guatemala).\n'
+printf 'Sin horarios válidos el registro permanece cerrado. Después ejecuta: docker compose up -d --force-recreate web\n'
