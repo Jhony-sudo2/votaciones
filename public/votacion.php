@@ -1,6 +1,23 @@
 <?php
 require_once dirname(__DIR__) . '/app/bootstrap.php';
 require_voter();
+$votingWindow = voting_window();
+if (!$votingWindow['is_open']) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        http_response_code(403);
+    }
+    page_start('Sistema de Votación');
+    show_flash();
+    show_voting_window($votingWindow);
+    ?>
+    <a class="back" href="/index.php">Volver al inicio</a>
+    <form action="/logout.php" method="post" class="logout-form">
+        <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
+        <button type="submit" class="btn btn-outline">Cerrar sesión</button>
+    </form>
+    <?php
+    exit;
+}
 $id = (int) $_SESSION['usuario_id'];
 $pdo = db();
 $error = '';
@@ -23,7 +40,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 set_flash('error', 'Tu usuario ya no tiene permiso para votar.');
                 redirect('login_votacion.php');
             }
-            if ((int) $voter['ha_votado'] !== 0) {
+            // Volver a validar después de adquirir el bloqueo del votante.
+            $votingWindow = voting_window();
+            if (!$votingWindow['is_open']) {
+                $pdo->rollBack();
+                http_response_code(403);
+            } elseif ((int) $voter['ha_votado'] !== 0) {
                 $pdo->rollBack();
                 $mensaje = 'Ya has ejercido tu derecho al voto.';
             } else {
@@ -59,10 +81,12 @@ if (!$voter || $voter['estado'] !== 'aprobado') {
     redirect('login_votacion.php');
 }
 $alreadyVoted = (bool) $voter['ha_votado'];
+$votingWindow = voting_window();
 page_start('Sistema de Votación');
 ?>
 <div class="user-info">Bienvenido: <strong><?= h($voter['nombre_completo']) ?></strong></div>
 <?php show_flash(); ?>
+<?php show_voting_window($votingWindow); ?>
 <?php if ($mensaje !== ''): ?>
     <div class="alert alert-success"><?= h($mensaje) ?></div><?php endif; ?>
 <?php if ($error !== ''): ?>
@@ -73,7 +97,7 @@ page_start('Sistema de Votación');
         <h2>Voto registrado</h2>
         <p>Ya has ejercido tu derecho al voto. Gracias por participar.</p>
     </div>
-<?php else: ?>
+<?php elseif ($votingWindow['is_open']): ?>
     <h2 class="section-title">Selecciona tu planilla</h2>
     <form method="post" id="votacionForm">
         <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">

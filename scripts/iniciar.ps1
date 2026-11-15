@@ -21,6 +21,7 @@ ADMIN_USER=admin
 ADMIN_PASSWORD=$adminPwd
 REGISTRO_APERTURA=
 REGISTRO_CIERRE=
+VOTACION_APERTURA=
 SMTP_HOST=
 SMTP_PORT=587
 SMTP_ENCRYPTION=tls
@@ -39,4 +40,5 @@ docker compose up --build -d
 if ($LASTEXITCODE -ne 0) { throw 'No se pudo levantar Docker Compose.' }
 Write-Host 'Abre http://127.0.0.1:8080/'
 Write-Host 'Configura REGISTRO_APERTURA y REGISTRO_CIERRE en .env (AAAA-MM-DD HH:MM:SS, hora de Guatemala).'
+Write-Host 'Configura VOTACION_APERTURA en .env con el mismo formato. La votación no tiene cierre automático.'
 Write-Host 'Sin horarios válidos el registro permanece cerrado. Después ejecuta: docker compose up -d --force-recreate web'

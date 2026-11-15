@@ -26,7 +26,9 @@ El inicio muestra el estado y los horarios, y ofrece el enlace de registro únic
 
 La aceptación depende de la hora del servidor en la última comprobación previa al INSERT. Una solicitud aceptada antes del cierre puede terminar de guardarse y confirmarse después. Si una carga o una conexión demorada cruza el cierre antes de esa comprobación, se rechaza el registro y se elimina la imagen que se haya movido al almacenamiento.
 
-La votación, el acceso de votantes y los paneles de operadores y resultados no tienen restricciones de horario. Los registros pendientes se pueden seguir aprobando o rechazando después del cierre.
+La votación tiene una apertura independiente y no tiene cierre automático. Configura `VOTACION_APERTURA` en `.env` o en el entorno del servicio, con el mismo formato y zona horaria. Si no está configurada o es inválida, no se permite votar. Desde el instante de apertura se permite votar, incluso después del cierre del registro. El inicio muestra también esta apertura.
+
+El acceso de votantes y los paneles de operadores y resultados siguen disponibles. Antes de la apertura, un votante puede iniciar sesión, pero no ve la papeleta y los POST a `votacion.php` son rechazados con HTTP 403. Los registros pendientes se pueden seguir aprobando o rechazando después del cierre.
 
 Pruebas del horario y de las páginas, sin MySQL ni envíos de formularios reales:
 

@@ -8,6 +8,7 @@ if (PHP_SAPI !== 'cli') {
 
 require_once dirname(__DIR__) . '/app/database.php';
 require_once dirname(__DIR__) . '/app/registration.php';
+require_once dirname(__DIR__) . '/app/voting.php';
 
 $checks = 0;
 function check(bool $condition, string $description): void
@@ -27,13 +28,15 @@ function set_window(string $opening, string $closing): void
 }
 
 /** Ejecuta las páginas en procesos aislados, con sesiones en memoria y sin MySQL. */
-function render_page(string $page, string $method = 'GET'): array
+function render_page(string $page, string $method = 'GET', array $session = [], array $post = []): array
 {
-    $script = <<<'PHP'
-session_set_save_handler(new class implements SessionHandlerInterface {
+    $script = '$testSession = ' . var_export($session, true) . ";\n";
+    $script .= <<<'PHP'
+session_set_save_handler(new class($testSession) implements SessionHandlerInterface {
+    public function __construct(private array $data) {}
     public function open(string $path, string $name): bool { return true; }
     public function close(): bool { return true; }
-    public function read(string $id): string|false { return ''; }
+    public function read(string $id): string|false { return serialize($this->data); }
     public function write(string $id, string $data): bool { return true; }
     public function destroy(string $id): bool { return true; }
     public function gc(int $lifetime): int|false { return 0; }
@@ -43,9 +46,10 @@ register_shutdown_function(static function (): void {
 });
 PHP;
     $script .= "\n" . '$_SERVER["REQUEST_METHOD"] = ' . var_export($method, true) . ';';
+    $script .= "\n" . '$_POST = ' . var_export($post, true) . ';';
     $script .= "\nrequire " . var_export(dirname(__DIR__) . '/public/' . $page, true) . ';';
     $process = proc_open(
-        [PHP_BINARY, '-d', 'session.use_cookies=1', '-r', $script],
+        [PHP_BINARY, '-d', 'session.use_cookies=1', '-d', 'session.serialize_handler=php_serialize', '-r', $script],
         [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
         $pipes
     );
@@ -62,11 +66,13 @@ PHP;
     return ['html' => $html, 'status' => (int) $matches[1]];
 }
 
-$previous = [getenv('REGISTRO_APERTURA'), getenv('REGISTRO_CIERRE')];
+$keys = ['REGISTRO_APERTURA', 'REGISTRO_CIERRE', 'VOTACION_APERTURA'];
+$previous = array_map('getenv', $keys);
 $previousTimezone = date_default_timezone_get();
 try {
     // La zona del sistema no debe modificar la interpretación del horario.
     date_default_timezone_set('UTC');
+    putenv('VOTACION_APERTURA= ');
     $opening = '2027-01-10 08:00:00';
     $closing = '2027-01-10 18:00:00';
     $cases = [
@@ -112,6 +118,7 @@ try {
         check(str_contains($index['html'], 'href="/registro.php"') === $isOpen, $state . ': enlace de registro incorrecto');
         check(str_contains($index['html'], 'href="/login_votacion.php"'), $state . ': acceso a votación ausente');
         check(str_contains($index['html'], 'datetime=') === ($state !== 'unconfigured'), $state . ': horario visible incorrecto');
+        check(!str_contains($index['html'], 'Se aceptan solicitudes desde la apertura y hasta antes del cierre.'), 'El mensaje eliminado sigue presente');
 
         $registration = render_page('registro.php');
         check($registration['status'] === 200, $state . ': aviso de registro inaccesible');
@@ -124,9 +131,53 @@ try {
             check($login['status'] === 200 && str_contains($login['html'], 'name="password"'), $state . ': acceso restringido por error en ' . $page);
         }
     }
+
+    // La apertura de votación no depende del cierre de las inscripciones.
+    set_window('2027-01-01 08:00:00', '2027-01-01 18:00:00');
+    $votingCases = [
+        ['antes de apertura', $opening, '2027-01-10T07:59:59.999999-06:00', 'pending'],
+        ['apertura exacta', $opening, '2027-01-10T08:00:00-06:00', 'open'],
+        ['apertura UTC', $opening, '2027-01-10T14:00:00Z', 'open'],
+        ['sin cierre al día siguiente', $opening, '2027-01-11T08:00:00-06:00', 'open'],
+        ['sin cierre un año después', $opening, '2028-01-10T08:00:00-06:00', 'open'],
+        ['sin configuración', '', '2027-01-10T09:00:00-06:00', 'unconfigured'],
+        ['fecha inválida', '2027-02-29 08:00:00', '2027-01-10T09:00:00-06:00', 'unconfigured'],
+        ['hora inválida', '2027-01-10 24:00:00', '2027-01-10T09:00:00-06:00', 'unconfigured'],
+        ['formato inválido', '10/01/2027 08:00', '2027-01-10T09:00:00-06:00', 'unconfigured'],
+    ];
+    foreach ($votingCases as [$label, $start, $instant, $expected]) {
+        putenv('VOTACION_APERTURA=' . ($start === '' ? ' ' : $start));
+        $window = voting_window(new DateTimeImmutable($instant));
+        check($window['status'] === $expected, 'Votación: ' . $label . ': estado incorrecto');
+        check($window['is_open'] === ($expected === 'open'), 'Votación: ' . $label . ': permiso incorrecto');
+    }
+
+    $votingPeriods = [
+        ['pending', $today->modify('+1 day')->format('Y-m-d H:i:s')],
+        ['open', $today->modify('-1 day')->format('Y-m-d H:i:s')],
+        ['unconfigured', ' '],
+        ['unconfigured', 'no-es-una-fecha'],
+    ];
+    foreach ($votingPeriods as [$state, $start]) {
+        putenv('VOTACION_APERTURA=' . $start);
+        $index = render_page('index.php');
+        check(str_contains($index['html'], 'aria-label="Horario de votación"'), 'Falta la apertura de votación en el inicio');
+        if ($state === 'open') {
+            check(str_contains($index['html'], 'La votación está abierta.'), 'Votación abierta no anunciada');
+            continue;
+        }
+        $session = ['usuario_id' => 1, 'csrf_token' => 'test-token'];
+        $get = render_page('votacion.php', 'GET', $session);
+        check($get['status'] === 200 && !str_contains($get['html'], 'id="votacionForm"'), 'La papeleta se muestra antes de la apertura');
+        $post = render_page('votacion.php', 'POST', $session, ['csrf_token' => 'test-token', 'opcion_voto' => 'opcion1']);
+        check($post['status'] === 403 && !str_contains($post['html'], 'id="votacionForm"'), 'Se permite un POST directo antes de la apertura');
+        check(str_contains($post['html'], 'action="/logout.php"'), 'El votante debe poder cerrar sesión');
+        $login = render_page('login_operador.php');
+        check($login['status'] === 200 && str_contains($login['html'], 'name="password"'), 'La apertura de votación afecta al operador');
+    }
     echo $checks . " comprobaciones correctas.\n";
 } finally {
-    foreach (['REGISTRO_APERTURA', 'REGISTRO_CIERRE'] as $index => $key) {
+    foreach ($keys as $index => $key) {
         putenv($previous[$index] === false ? $key : $key . '=' . $previous[$index]);
     }
     date_default_timezone_set($previousTimezone);
