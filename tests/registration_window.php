@@ -115,7 +115,7 @@ try {
         $isOpen = $state === 'open';
         $index = render_page('index.php');
         check($index['status'] === 200, $state . ': el inicio debe permanecer accesible');
-        check(str_contains($index['html'], 'href="/registro.php"') === $isOpen, $state . ': enlace de registro incorrecto');
+        check(str_contains($index['html'], 'href="/registro.php"'), $state . ': falta el enlace de registro');
         check(str_contains($index['html'], 'href="/login_votacion.php"'), $state . ': acceso a votación ausente');
         check(str_contains($index['html'], 'datetime=') === ($state !== 'unconfigured'), $state . ': horario visible incorrecto');
         check(!str_contains($index['html'], 'Se aceptan solicitudes desde la apertura y hasta antes del cierre.'), 'El mensaje eliminado sigue presente');

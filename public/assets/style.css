@@ -32,6 +32,15 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid 
 .alert-success { background: #e8f6ed; color: #135b33; border: 1px solid #afe1bf; }
 .alert-error { background: #fcebed; color: #86232f; border: 1px solid #efbbc1; }
 .user-info, .credentials { padding: 18px; margin: 12px 0 24px; background: #f1f6fc; border-left: 4px solid var(--blue); border-radius: 7px; }
+.schedule-notice { padding: 10px 14px; margin: 10px 0; border: 1px solid var(--border); border-radius: 8px; background: #f8fafc; font-size: 13px; line-height: 1.5; }
+.schedule-notice h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; font-size: 14px; font-weight: 650; }
+.schedule-notice p { margin: 4px 0 0; color: #51697c; }
+.schedule-status { padding: 2px 8px; border-radius: 12px; background: #e9eef4; color: #51697c; font-size: 12px; font-weight: 600; }
+.schedule-notice--open .schedule-status { background: #e8f6ed; color: #135b33; }
+.schedule-notice--pending .schedule-status { background: #fff3db; color: #755011; }
+.schedule-notice--closed .schedule-status { background: #fcebed; color: #86232f; }
+.schedule-notice .schedule-dates { display: flex; flex-wrap: wrap; column-gap: 18px; row-gap: 2px; font-size: 12px; }
+.schedule-dates time { font-variant-numeric: tabular-nums; }
 .credentials { background: #fff7e8; border-left-color: #d59c32; }
 .credentials code { font-size: 16px; overflow-wrap: anywhere; }
 .section-title { margin: 28px 0 16px; font-size: 21px; }

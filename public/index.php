@@ -11,9 +11,7 @@ page_start('Sistema de Votación');
 <?php show_registration_window($registrationWindow); ?>
 <?php show_voting_window($votingWindow); ?>
 <nav class="actions" aria-label="Menú principal">
-    <?php if ($registrationWindow['is_open']): ?>
-        <a class="btn btn-primary" href="/registro.php">Registrarse para votar</a>
-    <?php endif; ?>
+    <a class="btn btn-primary" href="/registro.php">Registrarse para votar</a>
     <a class="btn btn-secondary" href="/login_votacion.php">Acceder a votación</a>
 </nav>
 

@@ -30,12 +30,12 @@ function show_registration_window(array $window): void
 {
     $labels = ['pending' => 'Pendiente', 'open' => 'Abierto', 'closed' => 'Cerrado', 'unconfigured' => 'No disponible'];
     ?>
-    <section class="user-info" aria-label="Horario de registro">
-        <h2>Registro de votantes: <?= h($labels[$window['status']]) ?></h2>
+    <section class="schedule-notice schedule-notice--<?= h($window['status']) ?>" aria-label="Horario de registro">
+        <h2>Registro de votantes <span class="schedule-status"><?= h($labels[$window['status']]) ?></span></h2>
         <p><?= h($window['message']) ?></p>
         <?php if ($window['opens_at'] !== null && $window['closes_at'] !== null): ?>
-            <p>Apertura: <time datetime="<?= h($window['opens_at']->format(DateTimeInterface::ATOM)) ?>"><?= h($window['opens_at']->format('d/m/Y H:i:s')) ?></time><br>
-            Cierre: <time datetime="<?= h($window['closes_at']->format(DateTimeInterface::ATOM)) ?>"><?= h($window['closes_at']->format('d/m/Y H:i:s')) ?></time></p>
+            <p class="schedule-dates"><span>Apertura: <time datetime="<?= h($window['opens_at']->format(DateTimeInterface::ATOM)) ?>"><?= h($window['opens_at']->format('d/m/Y H:i:s')) ?></time></span>
+            <span>Cierre: <time datetime="<?= h($window['closes_at']->format(DateTimeInterface::ATOM)) ?>"><?= h($window['closes_at']->format('d/m/Y H:i:s')) ?></time></span></p>
         <?php endif; ?>
     </section>
     <?php
@@ -45,11 +45,11 @@ function show_voting_window(array $window): void
 {
     $labels = ['pending' => 'Pendiente', 'open' => 'Abierta', 'unconfigured' => 'No disponible'];
     ?>
-    <section class="user-info" aria-label="Horario de votación">
-        <h2>Votación: <?= h($labels[$window['status']]) ?></h2>
+    <section class="schedule-notice schedule-notice--<?= h($window['status']) ?>" aria-label="Horario de votación">
+        <h2>Votación <span class="schedule-status"><?= h($labels[$window['status']]) ?></span></h2>
         <p><?= h($window['message']) ?></p>
         <?php if ($window['opens_at'] !== null): ?>
-            <p>Apertura: <time datetime="<?= h($window['opens_at']->format(DateTimeInterface::ATOM)) ?>"><?= h($window['opens_at']->format('d/m/Y H:i:s')) ?></time></p>
+            <p class="schedule-dates"><span>Apertura: <time datetime="<?= h($window['opens_at']->format(DateTimeInterface::ATOM)) ?>"><?= h($window['opens_at']->format('d/m/Y H:i:s')) ?></time></span></p>
         <?php endif; ?>
     </section>
     <?php

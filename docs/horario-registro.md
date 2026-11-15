@@ -22,7 +22,7 @@ Si solo cambias los horarios posteriormente, basta con `docker compose up -d --f
 - Desde el cierre exacto, muestra «Cerrado» y rechaza nuevos registros.
 - Si faltan valores, tienen formato inválido o el cierre no es posterior a la apertura, muestra «No disponible» y no acepta registros.
 
-El inicio muestra el estado y los horarios, y ofrece el enlace de registro únicamente cuando está abierto. `registro.php` comprueba el horario también en el servidor: enviar un formulario antiguo o acceder directamente a la ruta no permite saltarse el cierre. Los POST fuera de horario responden con HTTP 403.
+El inicio muestra el estado y los horarios, y mantiene el enlace de registro siempre visible. Fuera del horario, el enlace lleva al aviso de registro pendiente, cerrado o no disponible, sin mostrar el formulario. `registro.php` comprueba el horario también en el servidor: enviar un formulario antiguo o acceder directamente a la ruta no permite saltarse el cierre. Los POST fuera de horario responden con HTTP 403.
 
 La aceptación depende de la hora del servidor en la última comprobación previa al INSERT. Una solicitud aceptada antes del cierre puede terminar de guardarse y confirmarse después. Si una carga o una conexión demorada cruza el cierre antes de esa comprobación, se rechaza el registro y se elimina la imagen que se haya movido al almacenamiento.
 
