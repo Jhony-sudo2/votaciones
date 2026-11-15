@@ -19,6 +19,7 @@ DB_PASSWORD=$dbPwd
 DB_ROOT_PASSWORD=$rootPwd
 ADMIN_USER=admin
 ADMIN_PASSWORD=$adminPwd
+APP_URL=https://votacioneslibertad-dehje4gfd6crc2e9.mexicocentral-01.azurewebsites.net
 REGISTRO_APERTURA=
 REGISTRO_CIERRE=
 VOTACION_APERTURA=

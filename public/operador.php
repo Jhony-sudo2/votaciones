@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__DIR__) . '/app/bootstrap.php';
 require_operator();
+require_once dirname(__DIR__) . '/app/credentials.php';
 require_once dirname(__DIR__) . '/app/mailer.php';
 $error = '';
 
@@ -14,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo = db();
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare('SELECT id, email, estado FROM usuarios WHERE id = ? FOR UPDATE');
+            $stmt = $pdo->prepare('SELECT id, nombre_completo, email, estado FROM usuarios WHERE id = ? FOR UPDATE');
             $stmt->execute([$id]);
             $candidate = $stmt->fetch();
             if (!$candidate || $candidate['estado'] !== 'pendiente') {
@@ -27,12 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 set_flash('success', 'Registro rechazado.');
                 redirect('operador.php');
             } else {
-                $username = 'votante_' . bin2hex(random_bytes(7));
-                $alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#';
-                $password = '';
-                for ($i = 0; $i < 18; $i++) {
-                    $password .= $alphabet[random_int(0, strlen($alphabet) - 1)];
-                }
+                $username = voter_username((int) $candidate['id']);
+                $password = voter_password();
                 $hash = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare("UPDATE usuarios SET estado='aprobado', usuario=?, password=? WHERE id=? AND estado='pendiente'");
                 $stmt->execute([$username, $hash, $id]);
@@ -40,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new RuntimeException('La aprobación no modificó el registro esperado.');
                 }
                 $pdo->commit();
-                $sent = send_credentials($candidate['email'], $username, $password);
+                $sent = send_credentials($candidate['email'], $username, $password, $candidate['nombre_completo']);
                 // Se muestran una sola vez después de aprobar; no se guardan en logs.
                 $_SESSION['nuevas_credenciales'] = [
                     'usuario' => $username,
@@ -77,6 +74,7 @@ page_start('Panel de Operadores', 'Validación de personas registradas');
         <p>Correo del votante: <strong><?= h($cred['email']) ?></strong></p>
         <p>Usuario: <code><?= h($cred['usuario']) ?></code></p>
         <p>Contraseña: <code><?= h($cred['password']) ?></code></p>
+        <p class="note">La contraseña usa solo letras MAYÚSCULAS y números, sin espacios. No incluye I, O, 0 ni 1.</p>
         <p class="note"><?= $cred['enviado'] ? 'Correo enviado; esta visualización es de respaldo.' : 'Correo no enviado: entrega la contraseña por un canal privado.' ?></p>
     </section>
 <?php endif; ?>
